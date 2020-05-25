@@ -53,3 +53,7 @@
     remote_src: yes
     src: /root/go/bin/terraform-provider-libvirt
     dest: /root/.terraform.d/plugins
+- name: Set chmod +x plugin
+  file:
+    path: /root/go/bin/terraform-provider-libvirt
+    mode: '0755'
