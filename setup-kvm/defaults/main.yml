@@ -1,0 +1,30 @@
+packages:
+- qemu-kvm
+- qemu-img
+- virt-manager
+- libvirt
+- libvirt-python
+- libvirt-client
+- libvirt-devel
+- virt-install
+- virt-viewer
+- bridge-utils
+- unzip
+- go
+
+bridge:
+  name: br0
+  ip: 192.168.122.1
+  netmask: 255.255.255.0
+  network: 192.168.122.0
+  broadcast: 192.168.122.255
+
+terraformModule: github.com/dmacvicar/terraform-provider-libvirt
+
+imagesPath: /opt/images
+dir_pool:
+  name: default
+  path: /var/lib/libvirt/images
+
+terraformVer: 0.12.24
+terraformUrl: "https://releases.hashicorp.com/terraform/{{ terraformVer }}/terraform_{{ terraformVer }}_linux_amd64.zip"

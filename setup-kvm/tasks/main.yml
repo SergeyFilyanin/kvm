@@ -1,0 +1,55 @@
+- name: Install epel-repo
+  yum:
+    name: epel-release
+- name: Setup packages
+  yum:
+    name: "{{ packages }}"
+- name: Setup ip4 forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+- name: Setup libvirtd
+  service:
+    name: libvirtd
+    state: started
+    enabled: yes
+  register: libvirtStatus
+- name: Setup directory pool
+  shell: |
+    virsh pool-define-as {{ dir_pool.name }} --type dir --target {{ dir_pool.path }}
+    virsh pool-start {{ dir_pool.name }}
+    virsh pool-autostart {{ dir_pool.name }}
+  when: libvirtStatus.changed
+- name: Download terraform
+  unarchive:
+    src: "{{ terraformUrl }}"
+    dest: /usr/local/bin
+    remote_src: yes
+- name: Setup directory for terraform
+  file:
+    path: "/root/{{ item }}"
+    state: directory
+  loop:
+  - .terraform.d
+  - .terraform.d/plugins
+  register: terraformDirs
+- name: Init terraform
+  shell: /usr/local/bin/terraform init
+  args:
+    chdir: /root/
+  when: terraformDirs.changed
+- name: Get go modules for terraform
+  shell: |
+    go get {{ terraformModule }}
+    go install github.com/dmacvicar/terraform-provider-libvirt
+  args:
+    chdir: /root/
+  when: terraformDirs.changed
+- name: Copy terraform plugin
+  copy:
+    remote_src: yes
+    src: /root/go/bin/terraform-provider-libvirt
+    dest: /root/.terraform.d/plugins

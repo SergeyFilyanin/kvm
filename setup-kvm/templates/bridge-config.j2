@@ -1,0 +1,11 @@
+ONBOOT=yes
+IPADDR={{ bridge.ip }}
+NETMASK={{ bridge.netmask }}
+NETWORK={{ bridge.network }}
+BROADCAST={{ bridge.broadcast }}
+IPV4_FAILURE_FATAL=yes
+IPV6INIT=no
+BOOTPROTO=none
+TYPE=Bridge
+DEVICE=br0
+MTU=1500

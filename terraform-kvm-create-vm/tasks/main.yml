@@ -1,0 +1,20 @@
+- name: Create directory for vms
+  file:
+    path: "{{ vms_dir_tf }}/{{ vm_name }}"
+    state: directory
+    recurse: yes
+
+- name: Setup templates vm
+  template:
+    src: '{{ item }}.j2'
+    dest: '{{ vms_dir_tf }}/{{ vm_name }}/{{ item }}'
+  loop:
+  - cloud_init.cfg
+  - vm_template.tf
+
+- name: Create {{ vm_name }}
+  shell: |
+    /usr/local/bin/terraform init
+    /usr/local/bin/terraform apply -auto-approve
+  args:
+    chdir: "{{ vms_dir_tf }}/{{ vm_name }}"
